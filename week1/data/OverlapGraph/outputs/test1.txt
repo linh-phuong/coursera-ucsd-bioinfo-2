@@ -1,0 +1,3 @@
+TTT->TTT
+CTT->TTT
+ACT->CTT

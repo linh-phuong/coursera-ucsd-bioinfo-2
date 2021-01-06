@@ -1,0 +1,3 @@
+TCG
+CGA
+GAA
