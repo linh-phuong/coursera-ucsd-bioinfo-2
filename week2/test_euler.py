@@ -1,4 +1,15 @@
-from week2.euler import PathOrdered, RandomCycle, EulerianCycle, IsEulerianCycle
+from week1.debruijn import DeBruijnGraphFromReads
+from week2.euler import (
+    EulerianPath,
+    IsEulerianPath,
+    IsEulerianPathText,
+    PathOrdered,
+    RandomCycle,
+    EulerianCycle,
+    IsEulerianCycle,
+    StringReconstruction,
+    UnbalancedNodes,
+)
 from pathlib import Path
 import pytest
 
@@ -48,3 +59,75 @@ def _parse_graph(path):
             k, vs = s.strip().split("->")
             ret[k.strip()] = vs.strip().split(",")
         return ret
+
+
+def test_UnbalancedNode():
+    test = {0: [2], 2: [2, 3], 4: [2], 3: [4]}
+    assert UnbalancedNodes(test) == (2, 0)
+    test = {0: [2], 1: [3], 2: [1], 3: [0, 4], 6: [3, 7], 7: [8], 8: [9], 9: [6]}
+    assert UnbalancedNodes(test) == (4, 6)
+    test = {0: [1], 1: [2], 2: [3]}
+    assert UnbalancedNodes(test) == (3, 0)
+
+
+def test_EulerianPath():
+    test = {0: [2], 1: [3], 2: [1], 3: [0, 4], 6: [3, 7], 7: [8], 8: [9], 9: [6]}
+    assert EulerianPath(test) == [6, 7, 8, 9, 6, 3, 0, 2, 1, 3, 4]
+    assert IsEulerianPath([6, 7, 8, 9, 6, 3, 0, 2, 1, 3, 4], test)
+
+    test = {0: [1], 1: [2], 2: [3]}
+    assert EulerianPath(test) == [0, 1, 2, 3]
+    assert IsEulerianPath([0, 1, 2, 3], test)
+
+    test = {0: [1], 1: [2, 5], 2: [3], 3: [4], 4: [1]}
+    assert EulerianPath(test) == [0, 1, 2, 3, 4, 1, 5]
+    assert IsEulerianPath([0, 1, 2, 3, 4, 1, 5], test)
+
+    test = {2: [1], 1: [3, 4, 0], 3: [1, 4], 4: [3, 1]}
+    assert EulerianPath(test) == [2, 1, 3, 4, 3, 1, 4, 1, 0]
+    assert IsEulerianPath([2, 1, 3, 4, 3, 1, 4, 1, 0], test)
+
+    test = {0: [1], 1: [14, 17], 14: [2, 3, 4], 2: [1], 3: [14], 4: [5], 5: [14]}
+    assert EulerianPath(test) == [0, 1, 14, 3, 14, 4, 5, 14, 2, 1, 17]
+    assert IsEulerianPath([0, 1, 14, 3, 14, 4, 5, 14, 2, 1, 17], test)
+
+    test = {2: [3, 5], 3: [4], 4: [2], 5: [6], 6: [2], 1: [2, 0], 0: [1]}
+    assert EulerianPath(test) == [1, 0, 1, 2, 5, 6, 2, 3, 4, 2]
+    assert IsEulerianPath([1, 0, 1, 2, 5, 6, 2, 3, 4, 2], test)
+
+
+TEST_DIR = Path("week2/data/StringReconstruction/inputs/")
+
+
+@pytest.mark.parametrize("inp", list(TEST_DIR.glob("*")))
+def test_StringReconstruction(inp):
+    out = str(inp).replace("/inputs/", "/outputs/")
+    k, reads = _parse_reads_and_k(inp)
+    exp_gene = _parse_gene(out)
+    gene = StringReconstruction(reads)
+    G = DeBruijnGraphFromReads(reads)
+    assert IsEulerianPathText(gene, G, k)
+    assert IsEulerianPathText(exp_gene, G, k)
+
+
+def test_StringReconstruction1():
+    inp = "week2/data/StringReconstruction/inputs/test5.txt"
+    out = str(inp).replace("/inputs/", "/outputs/")
+    k, reads = _parse_reads_and_k(inp)
+    exp_gene = _parse_gene(out)
+    gene = StringReconstruction(reads)
+    G = DeBruijnGraphFromReads(reads)
+    assert IsEulerianPathText(gene, G, k)
+    assert IsEulerianPathText(exp_gene, G, k)
+
+
+def _parse_reads_and_k(file):
+    with open(file) as fd:
+        k = fd.readline().strip()
+        reads = [s.strip() for s in fd.readlines()]
+    return int(k), reads
+
+
+def _parse_gene(file):
+    with open(file) as fd:
+        return fd.readline().strip()
