@@ -1,4 +1,4 @@
-from week1.debruijn import DeBruijnGraphFromReads, PathToGenome
+from week1.debruijn import DeBruijnGraphFromReads, PathToGenome, StringComposition
 
 
 def EulerianCycle(graph):
@@ -72,7 +72,6 @@ def UnbalancedNodes(graph):
     """
     values_flat = sum(graph.values(), [])
     all_nodes = set(values_flat + list(graph.keys()))
-    unbalanced_nodes = []
     fr, to = None, None
     for n in all_nodes:
         out_nodes = len(graph[n]) if n in graph else 0
@@ -106,6 +105,9 @@ def EulerianPath(graph):
 
     # Order cycle where the node with more outs in the beginning
     # and the node with more in locate in the end
+    # only when the graph is unbalanced
+    if fr is None or to is None:
+        return cycle[:-1]
     for i in range(len(cycle) - 1):
         if cycle[i] == fr and cycle[i + 1] == to:
             si = i + 1
@@ -113,7 +115,7 @@ def EulerianPath(graph):
     raise Exception("there are no eularian path")
 
 
-def IsEulerianPath(path, graph):
+def IsEulerianPathNb(path, graph):
     graph = {k: list(v) for k, v in graph.items()}
     for node in path:
         if graph[node]:
@@ -123,16 +125,18 @@ def IsEulerianPath(path, graph):
     return _is_empty(graph)
 
 
-def IsEulerianPathText(path, graph, kmer):
+def IsEulerianPath(path, graph):
     graph = {k: list(v) for k, v in graph.items()}
-    scanlen = len(path) - 1
-    for i in range(scanlen):
-        node = path[i : i + kmer - 1]
-        if graph[node]:
-            next_node = graph[node].pop()
-            if next_node not in graph.keys():
+    k = len(list(graph.keys())[0])
+    reads = StringComposition(k, path)
+    for r in reads:
+        if r not in graph:
+            graph.update({r: []})
+        if graph[r]:
+            next_node = graph[r].pop()
+            if next_node not in graph:
                 graph.update({next_node: []})
-    return _is_empty(graph)
+    return _is_empty(graph), graph
 
 
 def StringReconstruction(Patterns):

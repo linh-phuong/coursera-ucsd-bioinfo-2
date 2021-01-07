@@ -117,4 +117,3 @@ def test_DeBruijnGraphReads(inp):
     exp_G = _parse_graph(out)
     for k in G:
         assert sorted(G[k]) == sorted(exp_G[k])
-

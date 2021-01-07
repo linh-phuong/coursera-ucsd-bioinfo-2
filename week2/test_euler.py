@@ -2,7 +2,7 @@ from week1.debruijn import DeBruijnGraphFromReads
 from week2.euler import (
     EulerianPath,
     IsEulerianPath,
-    IsEulerianPathText,
+    IsEulerianPathNb,
     PathOrdered,
     RandomCycle,
     EulerianCycle,
@@ -73,27 +73,27 @@ def test_UnbalancedNode():
 def test_EulerianPath():
     test = {0: [2], 1: [3], 2: [1], 3: [0, 4], 6: [3, 7], 7: [8], 8: [9], 9: [6]}
     assert EulerianPath(test) == [6, 7, 8, 9, 6, 3, 0, 2, 1, 3, 4]
-    assert IsEulerianPath([6, 7, 8, 9, 6, 3, 0, 2, 1, 3, 4], test)
+    assert IsEulerianPathNb([6, 7, 8, 9, 6, 3, 0, 2, 1, 3, 4], test)
 
     test = {0: [1], 1: [2], 2: [3]}
     assert EulerianPath(test) == [0, 1, 2, 3]
-    assert IsEulerianPath([0, 1, 2, 3], test)
+    assert IsEulerianPathNb([0, 1, 2, 3], test)
 
     test = {0: [1], 1: [2, 5], 2: [3], 3: [4], 4: [1]}
     assert EulerianPath(test) == [0, 1, 2, 3, 4, 1, 5]
-    assert IsEulerianPath([0, 1, 2, 3, 4, 1, 5], test)
+    assert IsEulerianPathNb([0, 1, 2, 3, 4, 1, 5], test)
 
     test = {2: [1], 1: [3, 4, 0], 3: [1, 4], 4: [3, 1]}
     assert EulerianPath(test) == [2, 1, 3, 4, 3, 1, 4, 1, 0]
-    assert IsEulerianPath([2, 1, 3, 4, 3, 1, 4, 1, 0], test)
+    assert IsEulerianPathNb([2, 1, 3, 4, 3, 1, 4, 1, 0], test)
 
     test = {0: [1], 1: [14, 17], 14: [2, 3, 4], 2: [1], 3: [14], 4: [5], 5: [14]}
     assert EulerianPath(test) == [0, 1, 14, 3, 14, 4, 5, 14, 2, 1, 17]
-    assert IsEulerianPath([0, 1, 14, 3, 14, 4, 5, 14, 2, 1, 17], test)
+    assert IsEulerianPathNb([0, 1, 14, 3, 14, 4, 5, 14, 2, 1, 17], test)
 
     test = {2: [3, 5], 3: [4], 4: [2], 5: [6], 6: [2], 1: [2, 0], 0: [1]}
     assert EulerianPath(test) == [1, 0, 1, 2, 5, 6, 2, 3, 4, 2]
-    assert IsEulerianPath([1, 0, 1, 2, 5, 6, 2, 3, 4, 2], test)
+    assert IsEulerianPathNb([1, 0, 1, 2, 5, 6, 2, 3, 4, 2], test)
 
 
 TEST_DIR = Path("week2/data/StringReconstruction/inputs/")
@@ -106,8 +106,8 @@ def test_StringReconstruction(inp):
     exp_gene = _parse_gene(out)
     gene = StringReconstruction(reads)
     G = DeBruijnGraphFromReads(reads)
-    assert IsEulerianPathText(gene, G, k)
-    assert IsEulerianPathText(exp_gene, G, k)
+    assert IsEulerianPath(gene, G)
+    assert IsEulerianPath(exp_gene, G)
 
 
 def test_StringReconstruction1():
@@ -117,8 +117,8 @@ def test_StringReconstruction1():
     exp_gene = _parse_gene(out)
     gene = StringReconstruction(reads)
     G = DeBruijnGraphFromReads(reads)
-    assert IsEulerianPathText(gene, G, k)
-    assert IsEulerianPathText(exp_gene, G, k)
+    assert IsEulerianPath(gene, G)
+    assert IsEulerianPath(exp_gene, G)
 
 
 def _parse_reads_and_k(file):
@@ -131,3 +131,20 @@ def _parse_reads_and_k(file):
 def _parse_gene(file):
     with open(file) as fd:
         return fd.readline().strip()
+
+
+def test_StringReconstruct_large():
+    with open("week2/data/StringReconstructionProblem.txt") as fd:
+        fd.readline()
+        fd.readline()
+        reads = []
+        for read in fd.readlines():
+            if read.strip() != "Output:":
+                reads.append(read.strip())
+            else:
+                break
+            exp_gene = fd.readline()
+    gene = StringReconstruction(reads)
+    G = DeBruijnGraphFromReads(reads)
+    assert IsEulerianPath(gene, G)
+    assert IsEulerianPath(exp_gene, G)
