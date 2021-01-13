@@ -1,4 +1,5 @@
 from week1.debruijn import DeBruijnGraphFromReads, PathToGenome, StringComposition
+from itertools import product
 
 
 def EulerianCycle(graph):
@@ -139,8 +140,20 @@ def IsEulerianPath(path, graph):
     return _is_empty(graph), graph
 
 
-def StringReconstruction(Patterns):
-    dB = DeBruijnGraphFromReads(Patterns)
+def StringReconstruction(reads):
+    dB = DeBruijnGraphFromReads(reads)
     path = EulerianPath(dB)
     Text = PathToGenome(path)
     return Text
+
+
+def UniversalCircular(k):
+    if k < 2:
+        raise Exception("k has to be greater than 2 for universal circular from binary")
+    strings = ["".join(i) for i in product("01", repeat=k)]
+    G = DeBruijnGraphFromReads(strings)
+    Ep = EulerianPath(G)
+    univer_c = Ep[0]
+    for s in Ep:
+        univer_c += s[-1]
+    return univer_c[: -k + 1]

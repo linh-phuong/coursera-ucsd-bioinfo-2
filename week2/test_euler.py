@@ -1,4 +1,4 @@
-from week1.debruijn import DeBruijnGraphFromReads
+from week1.debruijn import DeBruijnGraphFromReads, StringComposition
 from week2.euler import (
     EulerianPath,
     IsEulerianPath,
@@ -9,9 +9,11 @@ from week2.euler import (
     IsEulerianCycle,
     StringReconstruction,
     UnbalancedNodes,
+    UniversalCircular,
 )
 from pathlib import Path
 import pytest
+from itertools import product
 
 
 def test_RandomCycle():
@@ -134,6 +136,7 @@ def _parse_gene(file):
 
 
 def test_StringReconstruct_large():
+    exp_gene = None
     with open("week2/data/StringReconstructionProblem.txt") as fd:
         fd.readline()
         fd.readline()
@@ -148,3 +151,33 @@ def test_StringReconstruct_large():
     G = DeBruijnGraphFromReads(reads)
     assert IsEulerianPath(gene, G)
     assert IsEulerianPath(exp_gene, G)
+
+
+def test_UniversalCircle():
+    assert UniversalCircular(2) == "0011"
+    k = 3
+    c = UniversalCircular(k)
+    comp = sorted(["".join(i) for i in product("01", repeat=k)])
+    cs = StringComposition(k, c + c[0 : k - 1])  # noqa: E203
+    assert sorted(cs) == sorted(comp)
+    k = 4
+    c = UniversalCircular(k)
+    comp = sorted(["".join(i) for i in product("01", repeat=k)])
+    cs = StringComposition(k, c + c[0 : k - 1])  # noqa: E203
+    assert sorted(cs) == sorted(comp)
+
+
+def test_UniversalCircle_large():
+    with open("week2/data/universal_string.txt") as fd:
+        fd.readline()
+        k = int(fd.readline().strip())
+        fd.readline()
+        s = fd.readline().strip()
+    ms = UniversalCircular(k)
+    exp_c = s + s[0 : k - 1]
+    c = ms + ms[0 : k - 1]
+    exp_comp = StringComposition(k, exp_c)
+    c_comp = StringComposition(k, c)
+    correct_comp = sorted(["".join(i) for i in product("01", repeat=k)])
+    assert sorted(exp_comp) == correct_comp
+    assert sorted(c_comp) == correct_comp
