@@ -25,49 +25,38 @@ def find_reverse_complement(dna):
     assert type(dna) is str, "dna has to be string type"
     assert " " not in dna, "there is space in the dna"
     complement = {"A": "T", "C": "G", "G": "C", "T": "A"}
-    rv_dna = ""
-    for n in dna:
-        rv_dna += complement[n]
-    return rv_dna
+    return "".join(complement[n] for n in dna)
 
 
 def find_all_peptides_encoding(noncoding_str, peptide):
-    assert type(noncoding_str) is str
+    assert isinstance(noncoding_str, str)
     assert " " not in noncoding_str, "the noncoding strain should not have space"
-    assert type(peptide) is str
+    assert isinstance(peptide, str)
     assert " " not in peptide, "the peptide should not have space"
     assert "U" not in peptide, "the noncoding strain has to be a DNA"
 
-    frames = []
+    encoding_strains = []
+
     rna = noncoding_str.replace("T", "U")
-    frames.append(rna[1:])
-    frames.append(rna[2:])
+    for i, fr in enumerate([rna, rna[1:], rna[2:]]):
+        es = find_peptide_encoding(fr, peptide)
+        for e in es:
+            ori_e = e.replace("U", "T")
 
-    frames_rv = []
+            # We only accept duplicated in the first frame
+            if i == 0 or ori_e not in encoding_strains:
+                assert ori_e in noncoding_str
+                encoding_strains.append(ori_e)
+
     rv = find_reverse_complement(noncoding_str)[::-1].replace("T", "U")
-    frames_rv.append(rv)
-    frames_rv.append(rv[1:])
-    frames_rv.append(rv[2:])
-
-    s0 = find_peptide_encoding(rna, peptide)
-    encoding_strains = [s.replace("U", "T") for s in s0] if s0 else []
-
-    for fr in frames:
+    for fr in [rv, rv[1:], rv[2:]]:
         es = find_peptide_encoding(fr, peptide)
-        if es:
-            for e in es:
-                ori_e = e.replace("U", "T")
-                if ori_e not in encoding_strains:
-                    assert ori_e in noncoding_str
-                    encoding_strains.append(ori_e)
-    for fr in frames_rv:
-        es = find_peptide_encoding(fr, peptide)
-        if es:
-            for e in es:
-                ori_e = find_reverse_complement(e.replace("U", "T")[::-1])
-                if ori_e not in encoding_strains:
-                    assert ori_e in noncoding_str, "the substrain is not in the noncoding strain"
-                    encoding_strains.append(ori_e)
+        for e in es:
+            # transform to non coding strain
+            ori_e = find_reverse_complement(e.replace("U", "T")[::-1])
+            if ori_e not in encoding_strains:
+                assert ori_e in noncoding_str, "the substrain is not in the noncoding strain"
+                encoding_strains.append(ori_e)
     return encoding_strains
 
 
