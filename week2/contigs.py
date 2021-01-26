@@ -23,14 +23,6 @@ def ContigGeneration(reads):
         loop_nodes = sorted([k for k in dB.keys() if dB[k]])
     else:
         return contigs
-    # while loop_nodes:
-    #     n_start = loop_nodes.pop()
-    #     n_to = dB[n_start].pop()
-    #     n_start += n_to[-1]
-    #     loop_nodes.remove(n_to)
-    #     n_to = dB[n_to].pop()
-    #     n_start += n_to[-1]
-    #     contigs.append(n_start)
     while loop_nodes:
         n_start = loop_nodes.pop()
         n_to = dB[n_start].pop()

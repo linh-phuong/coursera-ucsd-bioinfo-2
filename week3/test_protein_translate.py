@@ -5,6 +5,7 @@ from week3.protein_translate import (
     find_reverse_complement,
     translate_rna_with_position,
 )
+import pytest
 
 
 def test_protein_translate_small():
@@ -75,6 +76,9 @@ def _parse_peptides_large(file):
     return noncoding, proteins, substring
 
 
+@pytest.mark.xfail(
+    reason="multiple results can be accepted while the test provided by the excercise only gives one"
+)
 def test_findpeptide_large():
     noncoding, proteins, exp_substring = _parse_peptides_large("week3/data/peptide_encoding.txt")
     substrings = find_all_peptides_encoding(noncoding[0:], proteins)

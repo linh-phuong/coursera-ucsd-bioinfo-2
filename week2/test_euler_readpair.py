@@ -31,7 +31,7 @@ def _parse_gene(file):
 
 
 def test_StringReconstuctPair_ind():
-    inp = "week2/data/PairedStringReconstruction/inputs/test3.txt"
+    inp = "week2/data/PairedStringReconstruction/inputs/test2.txt"
     out = str(inp).replace("/inputs/", "/outputs/")
     k, d, pairs = _parse_reads_pairs(inp)
     gene = StringReconstructFromPairPath(pairs, k, d)
