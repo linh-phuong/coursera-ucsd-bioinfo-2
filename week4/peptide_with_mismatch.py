@@ -147,6 +147,8 @@ def select_best_candidates(candidates, spectrum, N):
     Returns:
         list: best candidates
     """
+    if not candidates:
+        return []
     candidates_with_score = []
     sc_list = []
     for c in candidates:
