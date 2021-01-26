@@ -34,26 +34,56 @@ def find_subpeptides_with_len(peptides, length):
     return subpeptides
 
 
-def find_linear_subpeptides_with_len(peptides, length):
+def find_linear_subpeptides_with_len(peptide, length):
+    """find all subpeptides with a certain length of a cyclo peptide that has been cut one time
+
+    Args:
+        peptide (sequence): the peptide can be given by a string or list of single masses  
+        length (int): lenght of the subpeptides 
+
+    Returns:
+        list: all possible subpeptides with a certain length
+    """
     subpeptides = []
-    scanlen = len(peptides) - length + 1
+    scanlen = len(peptide) - length + 1
     for i in range(scanlen):
-        subpeptides.append(peptides[i : i + length])
+        subpeptides.append(peptide[i : i + length])
     return subpeptides
 
 
-def find_all_subpeptides(peptides, linear=False):
-    psizes = len(peptides)
+def find_all_subpeptides(peptide, linear=False):
+    """find all possible subpeptide of a cyclopeptide
+    Args:
+    peptide (sequence): a cyclopeptide that can be in the format of a string of single amino acid 
+                            or a list of single masse of the amino acid
+    linear (bool, optional): False (default): all possible subpeptides of a cyclopeptide
+                             True: all possible subpeptides of a cyclopeptide that is cut once
+
+    Returns:
+        list: all possible subpeptides 
+    """
+    psizes = len(peptide)
     subpeptides = []
     for s in range(1, psizes):
         if not linear:
-            subpeptides += find_subpeptides_with_len(peptides, s)
+            subpeptides += find_subpeptides_with_len(peptide, s)
         else:
-            subpeptides += find_linear_subpeptides_with_len(peptides, s)
+            subpeptides += find_linear_subpeptides_with_len(peptide, s)
     return subpeptides
 
 
 def find_possible_spectrum(peptide, linear=False):
+    """find the theoretical spectrum of a peptide
+
+    Args:
+        peptide (str): a cyclopeptide 
+        linear (bool, optional): False(default): all possible subpeptides of a cyclopeptide
+                                 True: all possible subpeptides of a cyclopeptide that is cut once
+
+
+    Returns:
+        list: theoretical spectrum of the peptide
+    """
     massdict = _parse_peptide_mass()
     subpeptides = (
         find_all_subpeptides(peptide) if not linear else find_all_subpeptides(peptide, linear=True)
@@ -126,8 +156,9 @@ def count_peptides_given_mass_rc2(mass, mass_list):
     return c
 
 
-def _is_a_in_b(a, cnt_b):
+def _is_a_in_b(a, b):
     cnt_a = Counter(a)
+    cnt_b = Counter(b)
     return all(v <= cnt_b.get(k, 0) for k, v in cnt_a.items())
 
 

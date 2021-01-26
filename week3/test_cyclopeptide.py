@@ -24,6 +24,17 @@ def test_findsubpeptides_withlen():
     assert sorted(find_subpeptides_with_len(p, 2)) == sorted(["EL", "LE", "EL", "LE"])
 
 
+def test_findsubpeptides_givenmasses_withlen():
+    p = [114, 128]
+    assert sorted(find_subpeptides_with_len(p, 1)) == [[114], [128]]
+    p = [128, 128]
+    assert sorted(find_subpeptides_with_len(p, 1)) == [[128], [128]]
+    p = [129, 113, 129, 113]
+    assert sorted(find_subpeptides_with_len(p, 2)) == sorted(
+        [[129, 113], [113, 129], [129, 113], [113, 129]]
+    )
+
+
 def test_findlinearsubpeptides_withlen():
     assert find_linear_subpeptides_with_len("NQ", 1) == ["N", "Q"]
     assert find_linear_subpeptides_with_len("NQEL", 1) == ["N", "Q", "E", "L"]
@@ -46,6 +57,42 @@ def test_find_allsubpeptides():
     )
     assert sorted(find_all_subpeptides("ELEL", True)) == sorted(
         ["E", "L", "E", "L", "EL", "LE", "EL", "ELE", "LEL"]
+    )
+
+
+def test_find_allsubpeptides_givenmasses():
+    p = [114, 128]
+    assert sorted(find_all_subpeptides(p)) == [[114], [128]]
+    assert sorted(find_all_subpeptides(p, True)) == [[114], [128]]  # ["N", "Q"]
+    p = [129, 113, 129, 113]
+    assert sorted(find_all_subpeptides(p)) == sorted(
+        [
+            [129],
+            [113],
+            [129],
+            [113],
+            [129, 113],
+            [113, 129],
+            [129, 113],
+            [113, 129],
+            [129, 113, 129],
+            [113, 129, 113],
+            [129, 113, 129],
+            [113, 129, 113],
+        ]
+    )
+    assert sorted(find_all_subpeptides(p, True)) == sorted(
+        [
+            [129],
+            [113],
+            [129],
+            [113],
+            [129, 113],
+            [113, 129],
+            [129, 113],
+            [129, 113, 129],
+            [113, 129, 113],
+        ]
     )
 
 
